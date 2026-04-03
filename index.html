@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0e14">
+    <title>ANT TRANSLATOR PRO</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header__left">
+            <div class="header__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                </svg>
+            </div>
+            <div class="header__level">
+                <span class="header__level-label">УРОВЕНЬ ИССЛЕДОВАТЕЛЯ</span>
+                <span class="header__level-value" id="playerLevel">1</span>
+            </div>
+        </div>
+        <div class="header__center">
+            <span class="header__title">ANT</span>
+            <span class="header__subtitle">ТРАНСЛЯТОР ПРО</span>
+        </div>
+        <div class="header__right">
+            <div class="header__coins" id="coinsDisplay">
+                <span class="header__coins-icon">&#9679;</span>
+                <span class="header__coins-value">0</span>
+                <span class="header__coins-max">/ 1000</span>
+            </div>
+            <div class="header__bio-credits">
+                <span id="bioCredits">0</span> БИО-КРЕДИТОВ
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN SCREENS ===== -->
+    <main class="main">
+        <!-- SCANNER SCREEN -->
+        <section class="screen screen--scanner active" id="screenScanner">
+            <div class="camera-container">
+                <video id="cameraFeed" autoplay playsinline muted></video>
+                <canvas id="scannerCanvas"></canvas>
+
+                <!-- Scanner Overlay -->
+                <div class="scanner-overlay" id="scannerOverlay">
+                    <div class="scanner-frame" id="scannerFrame">
+                        <div class="scanner-frame__corner scanner-frame__corner--tl"></div>
+                        <div class="scanner-frame__corner scanner-frame__corner--tr"></div>
+                        <div class="scanner-frame__corner scanner-frame__corner--bl"></div>
+                        <div class="scanner-frame__corner scanner-frame__corner--br"></div>
+                        <div class="scanner-frame__crosshair">+</div>
+                        <div class="scanner-frame__scan-line" id="scanLine"></div>
+                    </div>
+
+                    <!-- Tracking Status -->
+                    <div class="tracking-status" id="trackingStatus">
+                        <span class="tracking-status__dot"></span>
+                        <span class="tracking-status__text">ПОИСК ЦЕЛИ...</span>
+                    </div>
+
+                    <!-- Coordinates -->
+                    <div class="coordinates" id="coordinates">
+                        <span>ШИР: --.- | ДОЛ: --.-</span>
+                    </div>
+
+                    <!-- Bio Match -->
+                    <div class="bio-match" id="bioMatch">
+                        БИОЛОГИЧЕСКОЕ СОВПАДЕНИЕ: <span id="bioMatchValue">--</span>%
+                    </div>
+
+                    <!-- Scan Progress -->
+                    <div class="scan-progress" id="scanProgress">
+                        <div class="scan-progress__label">АНАЛИЗ БИОМЕТРИИ...</div>
+                        <div class="scan-progress__bar">
+                            <div class="scan-progress__fill" id="scanProgressFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Panel (appears after scan) -->
+                <div class="info-panel" id="infoPanel">
+                    <div class="info-panel__header">
+                        <span class="info-panel__label">ВИД</span>
+                        <h2 class="info-panel__name" id="antName">--</h2>
+                    </div>
+                    <div class="info-panel__divider"></div>
+                    <div class="info-panel__grid">
+                        <div class="info-panel__item">
+                            <span class="info-panel__item-label">РОЛЬ</span>
+                            <span class="info-panel__item-value" id="antRole">--</span>
+                        </div>
+                        <div class="info-panel__item">
+                            <span class="info-panel__item-label">РЕДКОСТЬ</span>
+                            <span class="info-panel__item-value info-panel__item-value--rarity" id="antRarity">--</span>
+                        </div>
+                    </div>
+                    <div class="info-panel__item info-panel__item--full">
+                        <span class="info-panel__item-label">ДИЕТА</span>
+                        <span class="info-panel__item-value" id="antDiet">--</span>
+                    </div>
+                </div>
+
+                <!-- Target Lost Message -->
+                <div class="target-lost" id="targetLost">
+                    <div class="target-lost__icon">&#9888;</div>
+                    <div class="target-lost__text">ЦЕЛЬ ПОТЕРЯНА!</div>
+                    <div class="target-lost__sub">Верните муравья в кадр</div>
+                </div>
+            </div>
+
+            <!-- Pheromone Translation Subtitle -->
+            <div class="subtitle-bar" id="subtitleBar">
+                <div class="subtitle-bar__content">
+                    <p class="subtitle-bar__text" id="subtitleText">Наведите камеру на муравья для сканирования...</p>
+                    <span class="subtitle-bar__label">ПЕРЕВОД В РЕАЛЬНОМ ВРЕМЕНИ</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SPECIES SCREEN (Encyclopedia) -->
+        <section class="screen screen--species" id="screenSpecies">
+            <div class="screen__header">
+                <h2 class="screen__title">ЭНЦИКЛОПЕДИЯ ВИДОВ</h2>
+                <p class="screen__subtitle">Отсканировано: <span id="scannedCount">0</span> / <span id="totalSpecies">0</span></p>
+            </div>
+            <div class="species-grid" id="speciesGrid">
+                <!-- Filled dynamically -->
+            </div>
+        </section>
+
+        <!-- SPECIES DETAIL SCREEN -->
+        <section class="screen screen--detail" id="screenDetail">
+            <button class="back-btn" id="backToSpecies">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="detail-content" id="detailContent">
+                <!-- Filled dynamically -->
+            </div>
+        </section>
+
+        <!-- PHEROMONES SCREEN -->
+        <section class="screen screen--pheromones" id="screenPheromones">
+            <div class="screen__header">
+                <h2 class="screen__title">ЖУРНАЛ ФЕРОМОНОВ</h2>
+                <p class="screen__subtitle">Перехваченные сигналы</p>
+            </div>
+            <div class="pheromone-log" id="pheromoneLog">
+                <div class="pheromone-empty">Пока нет перехваченных сигналов. Начните сканирование!</div>
+            </div>
+        </section>
+
+        <!-- DATA SCREEN -->
+        <section class="screen screen--data" id="screenData">
+            <div class="screen__header">
+                <h2 class="screen__title">ДАННЫЕ ИССЛЕДОВАНИЙ</h2>
+            </div>
+            <div class="data-stats">
+                <div class="data-card">
+                    <div class="data-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    </div>
+                    <div class="data-card__value" id="totalScans">0</div>
+                    <div class="data-card__label">ВСЕГО СКАНИРОВАНИЙ</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div class="data-card__value" id="uniqueSpecies">0</div>
+                    <div class="data-card__label">УНИКАЛЬНЫХ ВИДОВ</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <div class="data-card__value" id="totalCoinsEarned">0</div>
+                    <div class="data-card__label">МОНЕТ ЗАРАБОТАНО</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <div class="data-card__value" id="rarestFind">--</div>
+                    <div class="data-card__label">САМАЯ РЕДКАЯ НАХОДКА</div>
+                </div>
+            </div>
+
+            <!-- Shop -->
+            <div class="shop" id="shop">
+                <h3 class="shop__title">МАГАЗИН УЛУЧШЕНИЙ</h3>
+                <div class="shop__item" id="shopSuperScanner">
+                    <div class="shop__item-info">
+                        <div class="shop__item-name">Супер-Сканер Всех Существ</div>
+                        <div class="shop__item-desc">Разблокирует сканирование жуков, бабочек, пауков и других насекомых</div>
+                    </div>
+                    <button class="shop__item-btn" id="buySuperScanner" disabled>
+                        <span class="shop__item-price">1000</span>
+                        <span class="shop__item-coin">&#9679;</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scan History -->
+            <div class="history">
+                <h3 class="history__title">ИСТОРИЯ СКАНИРОВАНИЙ</h3>
+                <div class="history__list" id="historyList">
+                    <div class="history__empty">Нет данных</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== COIN POPUP ===== -->
+    <div class="coin-popup" id="coinPopup">
+        <div class="coin-popup__content">
+            <div class="coin-popup__icon">&#9679;</div>
+            <div class="coin-popup__amount" id="coinPopupAmount">+10</div>
+            <div class="coin-popup__text" id="coinPopupText">Обычный муравей</div>
+        </div>
+    </div>
+
+    <!-- ===== SCAN BUTTON ===== -->
+    <button class="scan-btn" id="scanBtn">
+        <div class="scan-btn__ring"></div>
+        <div class="scan-btn__inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>
+            </svg>
+        </div>
+    </button>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <nav class="bottom-nav">
+        <button class="bottom-nav__item active" data-screen="scanner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M2 12h3M19 12h3M12 2v3M12 19v3"/>
+            </svg>
+            <span>СКАНЕР</span>
+        </button>
+        <button class="bottom-nav__item" data-screen="species">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <path d="M8 12a2 2 0 104 0 2 2 0 00-4 0z"/>
+                <path d="M16 8a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+            <span>ВИДЫ</span>
+        </button>
+        <button class="bottom-nav__item" data-screen="pheromones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z"/>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                <line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+            <span>ФЕРОМОНЫ</span>
+        </button>
+        <button class="bottom-nav__item" data-screen="data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 21H3V3"/><path d="M18 9l-5 5-2-2-4 4"/>
+            </svg>
+            <span>ДАННЫЕ</span>
+        </button>
+    </nav>
+
+    <!-- ===== NOTIFICATION ===== -->
+    <div class="notification" id="notification">
+        <span class="notification__text" id="notificationText"></span>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
